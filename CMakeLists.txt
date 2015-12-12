@@ -10,8 +10,8 @@ ELSE()
 	SET(CMAKE_C_FLAGS_RELEASE "-O3")
 ENDIF()
 
-ADD_LIBRARY (linecount SHARED src/linecount.cpp src/linecount.h)
-ADD_LIBRARY (linecount_static STATIC src/linecount.cpp src/linecount.h)
+ADD_LIBRARY (linecount SHARED src/turbo_linecount.cpp src/turbo_linecount.h)
+ADD_LIBRARY (linecount_static STATIC src/turbo_linecount.cpp src/turbo_linecount.h) 
 ADD_EXECUTABLE (lc src/main.cpp)
 TARGET_LINK_LIBRARIES (lc linecount_static)
 
