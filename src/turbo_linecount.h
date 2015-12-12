@@ -22,54 +22,56 @@
 #include<vector>
 #include<errno.h>
 
-#define BEGIN_TURBO_LINECOUNT_NAMESPACE namespace TURBO_LINECOUNT {
-#define END_TURBO_LINECOUNT_NAMESPACE }
+#define BEGIN_TURBOLINECOUNT_NAMESPACE namespace TURBOLINECOUNT {
+#define END_TURBOLINECOUNT_NAMESPACE }
 
 ////////////// Platform specific
 
 #ifdef _WIN32 // Windows	
 #include<Windows.h>
 #include<tchar.h>
+typedef errno_t tlc_error_t;
 #elif defined (__unix__) || (defined (__APPLE__) && defined (__MACH__)) // POSIX
 #include<unistd.h>
 #include<pthread.h>
 #define _T(x) x
 #define TCHAR char
+typedef tlc_error_t tlc_error_t;
 #endif
 
 ///////////////////////////////////////////// Line Count Class
 
-BEGIN_TURBO_LINECOUNT_NAMESPACE;
+BEGIN_TURBOLINECOUNT_NAMESPACE;
 
 ////////////// Platform specific
 #ifdef _WIN32 // Windows	
 	
 	#ifdef _UNICODE
-		typedef std::wstring LCSTRING;
+		typedef std::wstring tlc_string_t;
 	#else
-		typedef std::string LCSTRING;
+		typedef std::string tlc_string_t;
 	#endif
 
-	typedef HANDLE LCFILEHANDLE;
-	typedef long long LCFILEOFFSET;
-	typedef LCFILEOFFSET LCLINECOUNT;
-	#define LCLINECOUNTFMT "%I64d"
+	typedef HANDLE tlc_filehandle_t;
+	typedef long long tlc_fileoffset_t;
+	typedef tlc_fileoffset_t tlc_linecount_t;
+	#define TLC_LINECOUNT_FMT "%I64d"
 
 #elif defined (__unix__) || (defined (__APPLE__) && defined (__MACH__)) // POSIX
 	
-	typedef std::string LCSTRING;
-	typedef int LCFILEHANDLE;
+	typedef std::string tlc_string_t;
+	typedef int tlc_filehandle_t;
 	#if (defined (__APPLE__) && defined (__MACH__))
-		typedef off_t LCFILEOFFSET;
-		#define LCLINECOUNTFMT "%lld"
+		typedef off_t tlc_fileoffset_t;
+		#define TLC_LINECOUNT_FMT "%lld"
 	#elif defined(__linux__)
-		typedef off64_t LCFILEOFFSET;
-		#define LCLINECOUNTFMT "%lld"
+		typedef off64_t tlc_fileoffset_t;
+		#define TLC_LINECOUNT_FMT "%lld"
 	#else
-		typedef off_t LCFILEOFFSET;
-		#define LCLINECOUNTFMT "%d"
+		typedef off_t tlc_fileoffset_t;
+		#define TLC_LINECOUNT_FMT "%d"
 	#endif
-	typedef LCFILEOFFSET LCLINECOUNT;
+	typedef tlc_fileoffset_t tlc_linecount_t;
 
 #endif
 
@@ -88,10 +90,10 @@ private:
 
 	bool m_opened;
 	bool m_auto_close;
-	LCFILEHANDLE m_fh;
-	errno_t m_lasterror;
-	LCSTRING m_lasterrorstring;
-	LCFILEOFFSET m_filesize;
+	tlc_filehandle_t m_fh;
+	tlc_error_t m_lasterror;
+	tlc_string_t m_lasterrorstring;
+	tlc_fileoffset_t m_filesize;
 	PARAMETERS m_parameters;
 	int m_actual_thread_count;
 #ifdef _WIN32
@@ -100,12 +102,12 @@ private:
 #else
 	std::vector<pthread_t> m_threads;
 #endif
-	std::vector<LCLINECOUNT> m_threadlinecounts;
+	std::vector<tlc_linecount_t> m_threadlinecounts;
 	bool m_thread_fail;
 
 private:
 
-	void setLastError(errno_t error, LCSTRING lasterrorstring);
+	void setLastError(tlc_error_t error, tlc_string_t lasterrorstring);
 	void init();
 	bool createThread(int thread_number);
 #ifdef _WIN32
@@ -121,23 +123,23 @@ public:
 	~CLineCount();
 
 	bool isOpened() const;
-	errno_t lastError() const;
-	LCSTRING lastErrorString() const;
+	tlc_error_t lastError() const;
+	tlc_string_t lastErrorString() const;
 
-	bool open(LCFILEHANDLE fhandle, bool auto_close = false);
+	bool open(tlc_filehandle_t fhandle, bool auto_close = false);
 	bool open(const TCHAR * filename);
 	bool close();
 
-	bool countLines(LCLINECOUNT &linecount);
+	bool countLines(tlc_linecount_t &linecount);
 		
 public:
 
 	// Static utility functions
-	static LCLINECOUNT LineCount(LCFILEHANDLE fhandle, errno_t * error = NULL, LCSTRING * errorstring = NULL);
-	static LCLINECOUNT LineCount(const TCHAR *filename, errno_t * error = NULL, LCSTRING * errorstring = NULL);
+	static tlc_linecount_t LineCount(tlc_filehandle_t fhandle, tlc_error_t * error = NULL, tlc_string_t * errorstring = NULL);
+	static tlc_linecount_t LineCount(const TCHAR *filename, tlc_error_t * error = NULL, tlc_string_t * errorstring = NULL);
 };
 
-END_TURBO_LINECOUNT_NAMESPACE;
+END_TURBOLINECOUNT_NAMESPACE;
 
 #endif
 
@@ -151,11 +153,11 @@ extern "C"
 #endif
 
 #ifdef _WIN32
-	long long turbo_linecount_handle(HANDLE fhandle, errno_t * error = NULL, TCHAR ** errorstring = NULL);
-	long long turbo_linecount_file(const TCHAR *filename, errno_t * error = NULL, TCHAR ** errorstring = NULL);
+	long long turbo_linecount_handle(HANDLE fhandle, tlc_error_t * error = NULL, TCHAR ** errorstring = NULL);
+	long long turbo_linecount_file(const TCHAR *filename, tlc_error_t * error = NULL, TCHAR ** errorstring = NULL);
 #else
-	long long turbo_linecount_handle(int fhandle, errno_t * error = NULL, char ** errorstring = NULL);
-	long long turbo_linecount_file(const char *filename, errno_t * error = NULL, char ** errorstring = NULL);
+	long long turbo_linecount_handle(int fhandle, tlc_error_t * tlc_error = NULL, char ** errorstring = NULL);
+	long long turbo_linecount_file(const char *filename, tlc_error_t * error = NULL, char ** errorstring = NULL);
 #endif
 
 

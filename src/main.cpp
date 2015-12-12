@@ -26,7 +26,7 @@
 
 #endif
 
-using namespace TURBO_LINECOUNT;
+using namespace TURBOLINECOUNT;
 
 //////////////////////////////////////////////////////
 
@@ -161,26 +161,26 @@ int main(int argc, char **argv)
 
 	if (!lc.open(filename))
 	{
-		errno_t err = lc.lastError();
-		LCSTRING errstr = lc.lastErrorString();
+		tlc_error_t err = lc.lastError();
+		tlc_string_t errstr = lc.lastErrorString();
 
 		_ftprintf(stderr, _T("%s: Error %d (%s)\n"), argv[0], err, errstr.c_str());
 		return err;
 	}
 
 	// Count lines
-	LCLINECOUNT count;
+	tlc_linecount_t count;
 	if (!lc.countLines(count))
 	{
-		errno_t err = lc.lastError();
-		LCSTRING errstr = lc.lastErrorString();
+		tlc_error_t err = lc.lastError();
+		tlc_string_t errstr = lc.lastErrorString();
 
 		_ftprintf(stderr, _T("%s: Error %d: (%s)\n"), argv[0], err, errstr.c_str());
 		return err;
 	}
 
 	// Display output
-	_tprintf(_T(LCLINECOUNTFMT _T("\n")), count);
+	_tprintf(_T(TLC_LINECOUNT_FMT _T("\n")), count);
 	
 	return 0;
 }

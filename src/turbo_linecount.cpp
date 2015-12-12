@@ -21,7 +21,7 @@
 #define LCINVALIDHANDLE INVALID_HANDLE_VALUE
 #define LCSETREALLASTERROR(err, errstr) { setLastError((err), (errstr)); }
 #define MAP_FAILED NULL
-typedef long long LCFILEOFFSET;
+typedef long long tlc_fileoffset_t;
 
 #elif defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
 
@@ -32,17 +32,17 @@ typedef long long LCFILEOFFSET;
 #include<sys/mman.h>
 #if (defined (__APPLE__) && defined (__MACH__))
 #include <sys/sysctl.h>
-typedef off_t LCFILEOFFSET;
+typedef off_t tlc_fileoffset_t;
 #define MMAP ::mmap
 #define FSTAT ::fstat
 #define STAT ::stat
 #elif defined(__linux__)
-typedef off64_t LCFILEOFFSET;
+typedef off64_t tlc_fileoffset_t;
 #define MMAP ::mmap64
 #define FSTAT ::fstat64
 #define STAT ::stat64
 #else
-typedef off_t LCFILEOFFSET;
+typedef off_t tlc_fileoffset_t;
 #define MMAP ::mmap
 #define FSTAT ::fstat
 #define STAT ::stat
@@ -58,7 +58,7 @@ typedef off_t LCFILEOFFSET;
 
 ///////////////////////////// Line Count Class
 
-BEGIN_TURBO_LINECOUNT_NAMESPACE;
+BEGIN_TURBOLINECOUNT_NAMESPACE;
 
 struct LCTHREADCONTEXT
 {
@@ -131,18 +131,18 @@ void CLineCount::init(void)
 	m_threadlinecounts.clear();
 }
 
-void CLineCount::setLastError(errno_t lasterror, LCSTRING lasterrorstring)
+void CLineCount::setLastError(tlc_error_t lasterror, tlc_string_t lasterrorstring)
 {
 	m_lasterror = lasterror;
 	m_lasterrorstring = lasterrorstring;
 }
 
-errno_t CLineCount::lastError() const
+tlc_error_t CLineCount::lastError() const
 {
 	return m_lasterror;
 }
 
-LCSTRING CLineCount::lastErrorString() const
+tlc_string_t CLineCount::lastErrorString() const
 {
 	return m_lasterrorstring;
 }
@@ -152,7 +152,7 @@ bool CLineCount::isOpened() const
 	return m_opened;
 }
 
-bool CLineCount::open(LCFILEHANDLE fhandle, bool auto_close)
+bool CLineCount::open(tlc_filehandle_t fhandle, bool auto_close)
 {
 	if (m_opened)
 	{
@@ -222,12 +222,12 @@ void *threadProc(void *ctx)
 
 unsigned int CLineCount::countThread(int thread_number)
 {
-	LCFILEOFFSET buffersize = (LCFILEOFFSET)m_parameters.buffersize;
-	LCFILEOFFSET startoffset = buffersize * (LCFILEOFFSET)thread_number;
-	LCFILEOFFSET stride = buffersize * m_actual_thread_count;
-	LCFILEOFFSET curoffset = startoffset;
-	LCFILEOFFSET lastmapsize = 0;
-	LCLINECOUNT count = 0;
+	tlc_fileoffset_t buffersize = (tlc_fileoffset_t)m_parameters.buffersize;
+	tlc_fileoffset_t startoffset = buffersize * (tlc_fileoffset_t)thread_number;
+	tlc_fileoffset_t stride = buffersize * m_actual_thread_count;
+	tlc_fileoffset_t curoffset = startoffset;
+	tlc_fileoffset_t lastmapsize = 0;
+	tlc_linecount_t count = 0;
 	void *mem = NULL;
 
 	while (curoffset < m_filesize)
@@ -274,7 +274,7 @@ unsigned int CLineCount::countThread(int thread_number)
 		}
 
 		// Count newlines in buffer
-		LCFILEOFFSET windowoffset = 0;
+		tlc_fileoffset_t windowoffset = 0;
 		size_t windowleft = mapsize;
 		char *ptr = (char *)mem;
 		while (windowleft > 0)
@@ -359,7 +359,7 @@ bool CLineCount::createThread(int thread_number)
 	return true;
 }
 
-bool CLineCount::countLines(LCLINECOUNT & linecount)
+bool CLineCount::countLines(tlc_linecount_t & linecount)
 {
 	// Determine file size
 #ifdef _WIN32
@@ -388,8 +388,8 @@ bool CLineCount::countLines(LCLINECOUNT & linecount)
 	}
 
 	// Figure out actual thread count
-	LCFILEOFFSET windowcount = (m_filesize + (m_parameters.buffersize - 1)) / m_parameters.buffersize;
-	if (windowcount < (LCFILEOFFSET) m_parameters.threadcount)
+	tlc_fileoffset_t windowcount = (m_filesize + (m_parameters.buffersize - 1)) / m_parameters.buffersize;
+	if (windowcount < (tlc_fileoffset_t) m_parameters.threadcount)
 	{
 		m_actual_thread_count = (int)windowcount;
 	}
@@ -470,7 +470,7 @@ bool CLineCount::countLines(LCLINECOUNT & linecount)
 }
 
 // Static helpers
-LCLINECOUNT CLineCount::LineCount(LCFILEHANDLE fhandle, errno_t * error, LCSTRING *errorstring)
+tlc_linecount_t CLineCount::LineCount(tlc_filehandle_t fhandle, tlc_error_t * error, tlc_string_t *errorstring)
 {
 	CLineCount lc;
 	if (!lc.open(fhandle))
@@ -487,7 +487,7 @@ LCLINECOUNT CLineCount::LineCount(LCFILEHANDLE fhandle, errno_t * error, LCSTRIN
 		return -1;
 	}
 
-	LCLINECOUNT count;
+	tlc_linecount_t count;
 	if (!lc.countLines(count))
 	{
 		if (error)
@@ -507,7 +507,7 @@ LCLINECOUNT CLineCount::LineCount(LCFILEHANDLE fhandle, errno_t * error, LCSTRIN
 	return count;
 }
 
-LCLINECOUNT CLineCount::LineCount(const TCHAR *filename, errno_t * error, LCSTRING *errorstring)
+tlc_linecount_t CLineCount::LineCount(const TCHAR *filename, tlc_error_t * error, tlc_string_t *errorstring)
 {
 	CLineCount lc;
 	if (!lc.open(filename))
@@ -524,7 +524,7 @@ LCLINECOUNT CLineCount::LineCount(const TCHAR *filename, errno_t * error, LCSTRI
 		return -1;
 	}
 
-	LCLINECOUNT count;
+	tlc_linecount_t count;
 	if (!lc.countLines(count))
 	{
 		if (error)
@@ -544,22 +544,22 @@ LCLINECOUNT CLineCount::LineCount(const TCHAR *filename, errno_t * error, LCSTRI
 	return count;
 }
 
-END_TURBO_LINECOUNT_NAMESPACE;
+END_TURBOLINECOUNT_NAMESPACE;
 
 
 ///////////////////////////// C Linkage
 
-#ifndef _NO_TURBO_LINECOUNT_C
+#ifndef _NO_TURBOLINECOUNT_C
 
 #ifdef _WIN32
-long long turbo_linecount_handle(HANDLE fhandle, errno_t * error, TCHAR ** errorstring)
+long long turbo_linecount_handle(HANDLE fhandle, tlc_error_t * error, TCHAR ** errorstring)
 #else
-long long turbo_linecount_handle(int fhandle, errno_t * error, char ** errorstring)
+long long turbo_linecount_handle(int fhandle, tlc_error_t * error, char ** errorstring)
 #endif
 {
-	TURBO_LINECOUNT::LCSTRING errstr;
+	TURBOLINECOUNT::tlc_string_t errstr;
 
-	long long linecount = TURBO_LINECOUNT::CLineCount::LineCount(fhandle, error, &errstr);
+	long long linecount = TURBOLINECOUNT::CLineCount::LineCount(fhandle, error, &errstr);
 
 	if (errorstring)
 	{
@@ -570,14 +570,14 @@ long long turbo_linecount_handle(int fhandle, errno_t * error, char ** errorstri
 }
 
 #ifdef _WIN32
-long long turbo_linecount_file(const TCHAR *filename, errno_t * error, TCHAR ** errorstring)
+long long turbo_linecount_file(const TCHAR *filename, tlc_error_t * error, TCHAR ** errorstring)
 #else
-long long turbo_linecount_file(const char *filename, errno_t * error, char ** errorstring)
+long long turbo_linecount_file(const char *filename, tlc_error_t * error, char ** errorstring)
 #endif
 {
-	TURBO_LINECOUNT::LCSTRING errstr;
+	TURBOLINECOUNT::tlc_string_t errstr;
 
-	long long linecount = TURBO_LINECOUNT::CLineCount::LineCount(filename, error, &errstr);
+	long long linecount = TURBOLINECOUNT::CLineCount::LineCount(filename, error, &errstr);
 
 	if (errorstring)
 	{
