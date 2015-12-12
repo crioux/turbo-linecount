@@ -1,3 +1,9 @@
+#if defined(__CYGWIN__) || defined(__linux__) || defined(__MINGW32__)
+#ifndef _LARGEFILE64_SOURCE
+#define _LARGEFILE64_SOURCE 1
+#endif
+#endif
+
 //
 // Turbo Linecount
 // Copyright 2015, Christien Rioux
@@ -8,6 +14,8 @@
 
 #include"turbo_linecount.h"
 #include<algorithm>
+#include<cstring>
+#include<errno.h>
 #ifdef min
 #undef min
 #endif
@@ -51,7 +59,7 @@ typedef off_t tlc_fileoffset_t;
 #define LCOPENFILE(name) ::open(name, O_RDONLY)
 #define LCCLOSEFILE(handle) (::close(handle) != -1)
 #define LCINVALIDHANDLE -1
-#define LCSETREALLASTERROR(err, errstr) { int __err = errno; setLastError(__err, ::strerror(__err)); }
+#define LCSETREALLASTERROR(err, errstr) { int __err = errno; setLastError(__err, std::strerror(__err)); }
 #define _tcsdup strdup
 
 #endif
@@ -72,13 +80,13 @@ CLineCount::CLineCount(PARAMETERS *parameters)
 	// Set line count parameter defaults
 	int cpucount;
 	int allocationgranularity;
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__cygwin__) || defined(__MIN)
 	SYSTEM_INFO sysinfo;
 	GetSystemInfo(&sysinfo);
 	cpucount = sysinfo.dwNumberOfProcessors;
 	allocationgranularity = sysinfo.dwAllocationGranularity;
 //#elif defined(__linux__)
-#else
+#elif TLC_COMPATIBLE_UNIX
 	cpucount = sysconf(_SC_NPROCESSORS_ONLN);
 	allocationgranularity = sysconf(_SC_PAGESIZE);
 //#elif (defined (__APPLE__) && defined (__MACH__))

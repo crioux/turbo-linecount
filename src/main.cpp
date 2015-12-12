@@ -7,12 +7,14 @@
 ///////////////////////////////////////////////
 
 #include"turbo_linecount.h"
+#include<cstring>
+#include<cstdio>
 
 #ifdef _WIN32
 
 #include<tchar.h>
 
-#else
+#elif defined(TLC_COMPATIBLE_UNIX)
 
 #include<stdlib.h>
 #define _tprintf printf

@@ -27,14 +27,8 @@
 
 ////////////// Platform specific
 
-#if defined(_APPLE__) || defined(__CYGWIN__) || defined(__linux__) || defined(__MINGW32__)
+#if defined(_APPLE__) || defined(__linux__) || defined(__CYGWIN__) 
 #define TLC_COMPATIBLE_UNIX 1
-#endif
-
-#if defined(__CYGWIN__) || defined(__linux__) || defined(__MINGW32__)
-#ifndef _LARGEFILE64_SOURCE
-#define _LARGEFILE64_SOURCE 1
-#endif
 #endif
 
 #ifdef _WIN32 // Windows	
@@ -49,7 +43,7 @@ typedef errno_t tlc_error_t;
 #include<pthread.h>
 #define _T(x) x
 #define TCHAR char
-typedef tlc_error_t tlc_error_t;
+typedef error_t tlc_error_t;
 
 #else
 #error Unsupported operating system.
@@ -81,7 +75,7 @@ BEGIN_TURBOLINECOUNT_NAMESPACE;
 		typedef off_t tlc_fileoffset_t;
 		#define TLC_LINECOUNT_FMT "%lld"
 	#elif defined(_LARGEFILE64_SOURCE)
-		typedef off64_t tlc_fileoffset_t;
+		typedef _off64_t tlc_fileoffset_t;
 		#define TLC_LINECOUNT_FMT "%lld"
 	#else
 		typedef off_t tlc_fileoffset_t;
