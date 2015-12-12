@@ -23,9 +23,9 @@
 #define MAP_FAILED NULL
 typedef long long tlc_fileoffset_t;
 
-#elif defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
+#elif defined(TLC_COMPATIBLE_UNIX)
 
-// POSIX
+// Compatible Unix
 #include<sys/types.h>
 #include<sys/stat.h>
 #include<sys/fcntl.h>
@@ -36,7 +36,7 @@ typedef off_t tlc_fileoffset_t;
 #define MMAP ::mmap
 #define FSTAT ::fstat
 #define STAT ::stat
-#elif defined(__linux__)
+#elif (defined(__linux__) || defined(__cygwin__)) && defined(_LARGEFILE64_SOURCE)
 typedef off64_t tlc_fileoffset_t;
 #define MMAP ::mmap64
 #define FSTAT ::fstat64
@@ -571,7 +571,7 @@ long long turbo_linecount_handle(int fhandle, tlc_error_t * error, char ** error
 
 #ifdef _WIN32
 long long turbo_linecount_file(const TCHAR *filename, tlc_error_t * error, TCHAR ** errorstring)
-#else
+#elif defined(TLC_COMPATIBLE_UNIX)
 long long turbo_linecount_file(const char *filename, tlc_error_t * error, char ** errorstring)
 #endif
 {

@@ -27,16 +27,32 @@
 
 ////////////// Platform specific
 
+#if defined(_APPLE__) || defined(__CYGWIN__) || defined(__linux__) || defined(__MINGW32__)
+#define TLC_COMPATIBLE_UNIX 1
+#endif
+
+#if defined(__CYGWIN__) || defined(__linux__) || defined(__MINGW32__)
+#ifndef _LARGEFILE64_SOURCE
+#define _LARGEFILE64_SOURCE 1
+#endif
+#endif
+
 #ifdef _WIN32 // Windows	
+
 #include<Windows.h>
 #include<tchar.h>
 typedef errno_t tlc_error_t;
-#elif defined (__unix__) || (defined (__APPLE__) && defined (__MACH__)) // POSIX
+
+#elif defined(TLC_COMPATIBLE_UNIX)
+
 #include<unistd.h>
 #include<pthread.h>
 #define _T(x) x
 #define TCHAR char
 typedef tlc_error_t tlc_error_t;
+
+#else
+#error Unsupported operating system.
 #endif
 
 ///////////////////////////////////////////// Line Count Class
@@ -57,14 +73,14 @@ BEGIN_TURBOLINECOUNT_NAMESPACE;
 	typedef tlc_fileoffset_t tlc_linecount_t;
 	#define TLC_LINECOUNT_FMT "%I64d"
 
-#elif defined (__unix__) || (defined (__APPLE__) && defined (__MACH__)) // POSIX
+#elif defined(TLC_COMPATIBLE_UNIX) // Unix
 	
 	typedef std::string tlc_string_t;
 	typedef int tlc_filehandle_t;
 	#if (defined (__APPLE__) && defined (__MACH__))
 		typedef off_t tlc_fileoffset_t;
 		#define TLC_LINECOUNT_FMT "%lld"
-	#elif defined(__linux__)
+	#elif defined(_LARGEFILE64_SOURCE)
 		typedef off64_t tlc_fileoffset_t;
 		#define TLC_LINECOUNT_FMT "%lld"
 	#else
@@ -99,7 +115,7 @@ private:
 #ifdef _WIN32
 	std::vector<HANDLE> m_threads;
 	HANDLE m_filemapping;
-#else
+#elif defined(TLC_COMPATIBLE_UNIX)
 	std::vector<pthread_t> m_threads;
 #endif
 	std::vector<tlc_linecount_t> m_threadlinecounts;
@@ -112,7 +128,7 @@ private:
 	bool createThread(int thread_number);
 #ifdef _WIN32
 	friend DWORD WINAPI threadProc(LPVOID ctx);
-#else
+#elif defined(TLC_COMPATIBLE_UNIX)
 	friend void *threadProc(void *ctx);
 #endif
 	unsigned int countThread(int thread_number);
@@ -155,7 +171,7 @@ extern "C"
 #ifdef _WIN32
 	long long turbo_linecount_handle(HANDLE fhandle, tlc_error_t * error = NULL, TCHAR ** errorstring = NULL);
 	long long turbo_linecount_file(const TCHAR *filename, tlc_error_t * error = NULL, TCHAR ** errorstring = NULL);
-#else
+#elif defined(TLC_COMPATIBLE_UNIX)
 	long long turbo_linecount_handle(int fhandle, tlc_error_t * tlc_error = NULL, char ** errorstring = NULL);
 	long long turbo_linecount_file(const char *filename, tlc_error_t * error = NULL, char ** errorstring = NULL);
 #endif
