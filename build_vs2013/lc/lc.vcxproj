@@ -19,16 +19,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\turbo_linecount.cpp" />
     <ClCompile Include="..\src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\turbo_linecount.h" />
+    <ProjectReference Include="linecount_static.vcxproj">
+      <Project>{c6e64e54-0635-4a2b-b404-145ea82a761f}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E5D80D5A-FDE6-44FE-9E97-DF3D470DD5E9}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>linecount</RootNamespace>
+    <ProjectName>lc</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
