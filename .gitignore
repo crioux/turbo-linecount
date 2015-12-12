@@ -29,3 +29,6 @@
 
 # Cmake build directory
 build
+
+# Visual Studio build directory
+build_vs2013

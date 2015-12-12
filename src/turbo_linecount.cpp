@@ -1,4 +1,12 @@
-#include"linecount.h"
+//
+// Turbo Linecount
+// Copyright 2015, Christien Rioux
+// 
+// MIT Licensed, see file 'LICENSE' for details
+// 
+///////////////////////////////////////////////
+
+#include"turbo_linecount.h"
 #include<algorithm>
 #ifdef min
 #undef min
@@ -49,7 +57,7 @@ typedef off_t LCFILEOFFSET;
 
 ///////////////////////////// Line Count Class
 
-BEGIN_LINECOUNT_NAMESPACE;
+BEGIN_TURBO_LINECOUNT_NAMESPACE;
 
 struct LCTHREADCONTEXT
 {
@@ -122,13 +130,13 @@ void CLineCount::init(void)
 	m_threadlinecounts.clear();
 }
 
-void CLineCount::setLastError(LCERROR lasterror, LCSTRING lasterrorstring)
+void CLineCount::setLastError(errno_t lasterror, LCSTRING lasterrorstring)
 {
 	m_lasterror = lasterror;
 	m_lasterrorstring = lasterrorstring;
 }
 
-LCERROR CLineCount::lastError() const
+errno_t CLineCount::lastError() const
 {
 	return m_lasterror;
 }
@@ -461,7 +469,7 @@ bool CLineCount::countLines(LCLINECOUNT & linecount)
 }
 
 // Static helpers
-LCLINECOUNT CLineCount::LineCount(LCFILEHANDLE fhandle, LCERROR * error, LCSTRING *errorstring)
+LCLINECOUNT CLineCount::LineCount(LCFILEHANDLE fhandle, errno_t * error, LCSTRING *errorstring)
 {
 	CLineCount lc;
 	if (!lc.open(fhandle))
@@ -498,7 +506,7 @@ LCLINECOUNT CLineCount::LineCount(LCFILEHANDLE fhandle, LCERROR * error, LCSTRIN
 	return count;
 }
 
-LCLINECOUNT CLineCount::LineCount(const TCHAR *filename, LCERROR * error, LCSTRING *errorstring)
+LCLINECOUNT CLineCount::LineCount(const TCHAR *filename, errno_t * error, LCSTRING *errorstring)
 {
 	CLineCount lc;
 	if (!lc.open(filename))
@@ -535,4 +543,47 @@ LCLINECOUNT CLineCount::LineCount(const TCHAR *filename, LCERROR * error, LCSTRI
 	return count;
 }
 
-END_LINECOUNT_NAMESPACE;
+END_TURBO_LINECOUNT_NAMESPACE;
+
+
+///////////////////////////// C Linkage
+
+#ifndef _NO_TURBO_LINECOUNT_C
+
+#ifdef _WIN32
+long long turbo_linecount_handle(HANDLE fhandle, errno_t * error, TCHAR ** errorstring)
+#else
+long long turbo_linecount_handle(int fhandle, errno_t * error, char ** errorstring)
+#endif
+{
+	TURBO_LINECOUNT::LCSTRING errstr;
+
+	long long linecount = TURBO_LINECOUNT::CLineCount::LineCount(fhandle, error, &errstr);
+
+	if (errorstring)
+	{
+		*errorstring = _tcsdup(errstr.c_str());
+	}
+
+	return linecount;
+}
+
+#ifdef _WIN32
+long long turbo_linecount_file(const TCHAR *filename, errno_t * error, TCHAR ** errorstring)
+#else
+long long turbo_linecount_file(const char *filename, errno_t * error, char ** errorstring)
+#endif
+{
+	TURBO_LINECOUNT::LCSTRING errstr;
+
+	long long linecount = TURBO_LINECOUNT::CLineCount::LineCount(filename, error, &errstr);
+
+	if (errorstring)
+	{
+		*errorstring = _tcsdup(errstr.c_str());
+	}
+
+	return linecount;
+}
+
+#endif

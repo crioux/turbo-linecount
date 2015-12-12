@@ -1,4 +1,12 @@
-#include"linecount.h"
+//
+// Turbo Linecount
+// Copyright 2015, Christien Rioux
+// 
+// MIT Licensed, see file 'LICENSE' for details
+// 
+///////////////////////////////////////////////
+
+#include"turbo_linecount.h"
 
 #ifdef _WIN32
 
@@ -18,7 +26,7 @@
 
 #endif
 
-using namespace LineCount;
+using namespace TURBO_LINECOUNT;
 
 //////////////////////////////////////////////////////
 
@@ -153,7 +161,7 @@ int main(int argc, char **argv)
 
 	if (!lc.open(filename))
 	{
-		LCERROR err = lc.lastError();
+		errno_t err = lc.lastError();
 		LCSTRING errstr = lc.lastErrorString();
 
 		_ftprintf(stderr, _T("%s: Error %d (%s)\n"), argv[0], err, errstr.c_str());
@@ -164,7 +172,7 @@ int main(int argc, char **argv)
 	LCLINECOUNT count;
 	if (!lc.countLines(count))
 	{
-		LCERROR err = lc.lastError();
+		errno_t err = lc.lastError();
 		LCSTRING errstr = lc.lastErrorString();
 
 		_ftprintf(stderr, _T("%s: Error %d: (%s)\n"), argv[0], err, errstr.c_str());
