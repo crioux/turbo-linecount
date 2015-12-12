@@ -3,7 +3,7 @@
 
 lctest()
 {
-	OUT=`(time ./lc $1) 2>&1 | grep real | cut -f 2 | cut -c 3-`
+	OUT=`(time lc $1) 2>&1 | grep real | cut -f 2 | cut -c 3-`
 	echo "lc: $1 $OUT"
 	return 0
 }
