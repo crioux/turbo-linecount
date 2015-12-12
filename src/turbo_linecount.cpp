@@ -52,6 +52,7 @@ typedef off_t LCFILEOFFSET;
 #define LCCLOSEFILE(handle) (::close(handle) != -1)
 #define LCINVALIDHANDLE -1
 #define LCSETREALLASTERROR(err, errstr) { int __err = errno; setLastError(__err, ::strerror(__err)); }
+#define _tcsdup strdup
 
 #endif
 
