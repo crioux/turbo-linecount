@@ -8,7 +8,9 @@
 #define LCCLOSEFILE(handle) CloseHandle(handle)
 #define LCINVALIDHANDLE INVALID_HANDLE_VALUE
 #define LCSETREALLASTERROR(err, errstr) { setLastError((err), (errstr)); }
+#define MAP_FAILED NULL;
 typedef long long LCFILEOFFSET;
+
 #elif defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
 
 // POSIX
@@ -16,23 +18,28 @@ typedef long long LCFILEOFFSET;
 #include<sys/stat.h>
 #include<sys/fcntl.h>
 #include<sys/mman.h>
-#include<pthread.h>
-#if (defined (__APPLE__) && defined (__MACH__)
+#if (defined (__APPLE__) && defined (__MACH__))
 #include <sys/sysctl.h>
 typedef off_t LCFILEOFFSET;
-#define MMAP mmap
+#define MMAP ::mmap
+#define FSTAT ::fstat
+#define STAT ::stat
 #elif defined(__linux__)
 typedef off64_t LCFILEOFFSET;
-#define MMAP mmap64
+#define MMAP ::mmap64
+#define FSTAT ::fstat64
+#define STAT ::stat64
 #else
 typedef off_t LCFILEOFFSET;
-#define MMAP mmap
+#define MMAP ::mmap
+#define FSTAT ::fstat
+#define STAT ::stat
 #endif
 
-#define LCOPENFILE(name) open(name, O_RDONLY)
-#define LCCLOSEFILE(handle) (close(handle) != -1)
+#define LCOPENFILE(name) ::open(name, O_RDONLY)
+#define LCCLOSEFILE(handle) (::close(handle) != -1)
 #define LCINVALIDHANDLE -1
-#define LCSETREALLASTERROR(err, errstr) { int __err = errno; setLastError(__err, strerror(__err)); }
+#define LCSETREALLASTERROR(err, errstr) { int __err = errno; setLastError(__err, ::strerror(__err)); }
 
 #endif
 
@@ -51,37 +58,36 @@ CLineCount::CLineCount(PARAMETERS *parameters)
 
 	// Set line count parameter defaults
 	int cpucount;
+	int allocationgranularity;
 #ifdef _WIN32
 	SYSTEM_INFO sysinfo;
 	GetSystemInfo(&sysinfo);
 	cpucount = sysinfo.dwNumberOfProcessors;
-#elif defined(__linux__)
-	cpucount = sysconf(_SC_NPROCESSORS_ONLN);
-#elif (defined (__APPLE__) && defined (__MACH__))
-	intsize_t count_len = sizeof(cpucount);
-	sysctlbyname("hw.logicalcpu", &cpucount, &count_len, NULL, 0);
+	allocationgranularity = sysinfo.dwAllocationGranularity;
+//#elif defined(__linux__)
 #else
-	cpucount = 1;
+	cpucount = sysconf(_SC_NPROCESSORS_ONLN);
+	allocationgranularity = sysconf(_SC_PAGESIZE);
+//#elif (defined (__APPLE__) && defined (__MACH__))
+//	mmsize_t count_len = sizeof(cpucount);
+//	sysctlbyname("hw.logicalcpu", &cpucount, &count_len, NULL, 0);
+//#else
+//	cpucount = 1;
 #endif
-	m_parameters.workercount = cpucount;
-	m_parameters.windowsize = (1024 * 1024 * 8) / cpucount;
+	m_parameters.threadcount = cpucount;
+	m_parameters.buffersize = (1024 * 1024);
 	
 	// Override defaults if specified
 	if (parameters)
 	{
-		if (parameters->windowsize != -1)
+		if (parameters->buffersize != -1)
 		{
-			m_parameters.windowsize = parameters->windowsize;
-#ifdef _WIN32
-			// Window size must be multiple of allocation granularity. Round up.
-			SYSTEM_INFO si;
-			GetSystemInfo(&si);
-			m_parameters.windowsize += (si.dwAllocationGranularity - (m_parameters.windowsize % si.dwAllocationGranularity)) % si.dwAllocationGranularity;
-#endif
+			m_parameters.buffersize = parameters->buffersize;
+			m_parameters.buffersize += (allocationgranularity - (m_parameters.buffersize % allocationgranularity)) % allocationgranularity;
 		}
-		if (parameters->workercount != -1)
+		if (parameters->threadcount != -1)
 		{
-			m_parameters.workercount = parameters->workercount;
+			m_parameters.threadcount = parameters->threadcount;
 		}
 	}
 	
@@ -197,14 +203,15 @@ void *threadProc(void *ctx)
 #endif
 {
 	LCTHREADCONTEXT *lctctx = (LCTHREADCONTEXT*)ctx;
-	return lctctx->m_this->countThread(lctctx->thread_number);
+	lctctx->m_this->countThread(lctctx->thread_number);
+	return NULL;
 }
 
 unsigned int CLineCount::countThread(int thread_number)
 {
-	LCFILEOFFSET windowsize = (LCFILEOFFSET)m_parameters.windowsize;
-	LCFILEOFFSET startoffset = windowsize * (LCFILEOFFSET)thread_number;
-	LCFILEOFFSET stride = windowsize * m_actual_thread_count;
+	LCFILEOFFSET buffersize = (LCFILEOFFSET)m_parameters.buffersize;
+	LCFILEOFFSET startoffset = buffersize * (LCFILEOFFSET)thread_number;
+	LCFILEOFFSET stride = buffersize * m_actual_thread_count;
 	LCFILEOFFSET curoffset = startoffset;
 	LCFILEOFFSET lastmapsize = 0;
 	LCLINECOUNT count = 0;
@@ -214,11 +221,12 @@ unsigned int CLineCount::countThread(int thread_number)
 	{
 		if (m_thread_fail)
 		{
+
 			return -1;
 		}
 
 		// Get best file mapping window size
-		size_t mapsize = (size_t)min((m_filesize - curoffset), windowsize);
+		size_t mapsize = (size_t)std::min((m_filesize - curoffset), buffersize);
 
 		// Map view of file
 #ifdef _WIN32
@@ -235,16 +243,17 @@ unsigned int CLineCount::countThread(int thread_number)
 #else
 		if (mem)
 		{
-			if(munmap(mem)!=0)
+			if(munmap(mem, lastmapsize) !=0)
 			{
 				LCSETREALLASTERROR(EINVAL, _T("memory unmap failed"));
 				m_thread_fail = true;
 				return -1;
 			}
 		}
-		mem = MMAP(NULL, mapsize, PROT_READ, MAP_FILE | MAP_SHARED, m_fd, curoffset);
+		mem = MMAP(NULL, mapsize, PROT_READ, MAP_FILE | MAP_SHARED, m_fh, curoffset);
+//		printf("%p %lld %lld\n",mem, mapsize, curoffset);
 #endif		
-		if (mem == NULL)
+		if (mem == MAP_FAILED)
 		{
 			LCSETREALLASTERROR(EINVAL, _T("memory map failed"));
 			m_thread_fail = true;
@@ -299,7 +308,7 @@ unsigned int CLineCount::countThread(int thread_number)
 #else
 	if (mem)
 	{
-		if (munmap(mem) != 0)
+		if (munmap(mem, lastmapsize) != 0)
 		{
 			LCSETREALLASTERROR(EINVAL, _T("memory unmap failed"));
 			m_thread_fail = true;
@@ -349,8 +358,8 @@ bool CLineCount::countLines(LCLINECOUNT & linecount)
 	}
 	m_filesize = li.QuadPart;
 #else
-	struct stat64 statbuf;
-	if(fstat64(m_fh,&statbuf)!=0)
+	struct STAT statbuf;
+	if(FSTAT(m_fh,&statbuf)!=0)
 	{
 		LCSETREALLASTERROR(EBADF, _T("unable to get file size"));
 		return false;
@@ -366,15 +375,17 @@ bool CLineCount::countLines(LCLINECOUNT & linecount)
 	}
 
 	// Figure out actual thread count
-	LCFILEOFFSET windowcount = (m_filesize + (m_parameters.windowsize - 1)) / m_parameters.windowsize;
-	if (windowcount < (LCFILEOFFSET) m_parameters.workercount)
+	LCFILEOFFSET windowcount = (m_filesize + (m_parameters.buffersize - 1)) / m_parameters.buffersize;
+	if (windowcount < (LCFILEOFFSET) m_parameters.threadcount)
 	{
 		m_actual_thread_count = (int)windowcount;
 	}
 	else
 	{
-		m_actual_thread_count = m_parameters.workercount;
+		m_actual_thread_count = m_parameters.threadcount;
 	}
+
+//	printf("act: %d\n",m_actual_thread_count);
 
 #ifdef _WIN32
 	// Prepare file mapping
@@ -405,7 +416,7 @@ bool CLineCount::countLines(LCLINECOUNT & linecount)
 #ifdef _WIN32
 			success = (WaitForSingleObject(m_threads[i], INFINITE) == WAIT_OBJECT_0);
 #else
-			success = pthread_join(m_threads[i]) == 0;
+			success = pthread_join(m_threads[i], NULL) == 0;
 #endif
 		}
 
@@ -429,7 +440,7 @@ bool CLineCount::countLines(LCLINECOUNT & linecount)
 		return false;
 	}
 
-	if (complete != m_parameters.workercount)
+	if (complete != m_actual_thread_count)
 	{
 		setLastError(ECHILD, _T("thread join failed"));
 		return false;

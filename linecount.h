@@ -1,6 +1,9 @@
 #ifndef __INC_LINECOUNT_H
 #define __INC_LINECOUNT_H
 
+#define LINECOUNT_VERSION_MAJOR 1
+#define LINECOUNT_VERSION_MINOR 0
+
 ///////////////////////////////////////////// Headers
 
 ////////////// Platform independent
@@ -18,6 +21,7 @@
 #include<tchar.h>
 #elif defined (__unix__) || (defined (__APPLE__) && defined (__MACH__)) // POSIX
 #include<unistd.h>
+#include<pthread.h>
 #define _T(x) x
 #define TCHAR char
 #endif
@@ -45,7 +49,7 @@ BEGIN_LINECOUNT_NAMESPACE;
 	typedef std::string LCSTRING;
 	typedef int LCFILEHANDLE;
 	typedef errno_t LCERROR;
-	#if (defined (__APPLE__) && defined (__MACH__)
+	#if (defined (__APPLE__) && defined (__MACH__))
 		typedef off_t LCFILEOFFSET;
 		#define LCLINECOUNTFMT "%lld"
 	#elif defined(__linux__)
@@ -66,8 +70,8 @@ public:
 
 	struct PARAMETERS
 	{
-		size_t windowsize;
-		int workercount;
+		size_t buffersize;
+		int threadcount;
 	};
 
 private:
