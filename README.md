@@ -1,0 +1,2 @@
+# linecount
+Superfast Line Counter
