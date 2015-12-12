@@ -12,6 +12,12 @@
 #define LINECOUNT_VERSION_MAJOR 1
 #define LINECOUNT_VERSION_MINOR 0
 
+#if defined(__CYGWIN__) || defined(__linux__) || defined(__MINGW32__)
+#ifndef _LARGEFILE64_SOURCE
+#define _LARGEFILE64_SOURCE 1
+#endif
+#endif
+
 #ifdef __cplusplus
 
 ///////////////////////////////////////////// Headers
@@ -31,7 +37,7 @@
 #define TLC_COMPATIBLE_UNIX 1
 #endif
 
-#ifdef _WIN32 // Windows	
+#ifdef _WIN32 // Windows
 
 #include<Windows.h>
 #include<tchar.h>
@@ -75,7 +81,11 @@ BEGIN_TURBOLINECOUNT_NAMESPACE;
 		typedef off_t tlc_fileoffset_t;
 		#define TLC_LINECOUNT_FMT "%lld"
 	#elif defined(_LARGEFILE64_SOURCE)
-		typedef _off64_t tlc_fileoffset_t;
+		#if defined(__CYGWIN__)
+			typedef _off64_t tlc_fileoffset_t;	
+		#else
+			typedef off64_t tlc_fileoffset_t;	
+		#endif
 		#define TLC_LINECOUNT_FMT "%lld"
 	#else
 		typedef off_t tlc_fileoffset_t;
