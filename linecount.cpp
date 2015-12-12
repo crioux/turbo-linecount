@@ -1,4 +1,8 @@
 #include"linecount.h"
+#include<algorithm>
+#ifdef min
+#undef min
+#endif
 
 ///////////////////////////// Platform specific
 #ifdef _WIN32
@@ -8,7 +12,7 @@
 #define LCCLOSEFILE(handle) CloseHandle(handle)
 #define LCINVALIDHANDLE INVALID_HANDLE_VALUE
 #define LCSETREALLASTERROR(err, errstr) { setLastError((err), (errstr)); }
-#define MAP_FAILED NULL;
+#define MAP_FAILED NULL
 typedef long long LCFILEOFFSET;
 
 #elif defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
