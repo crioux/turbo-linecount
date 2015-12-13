@@ -1,9 +1,3 @@
-#if defined(__CYGWIN__) || defined(__linux__) || defined(__MINGW32__)
-#ifndef _LARGEFILE64_SOURCE
-#define _LARGEFILE64_SOURCE 1
-#endif
-#endif
-
 //
 // Turbo Linecount
 // Copyright 2015, Christien Rioux
@@ -21,7 +15,7 @@
 #endif
 
 ///////////////////////////// Platform specific
-#ifdef _WIN32
+#if defined(_WIN32) 
 
 // Windows	
 #define LCOPENFILE(name) CreateFile(name, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL)
@@ -422,7 +416,11 @@ bool CLineCount::countLines(tlc_linecount_t & linecount)
 		if (!createThread(i))
 		{
 			setLastError(ECHILD, _T("failed to create counting thread"));
+			
 			m_thread_fail = true;
+
+			m_actual_thread_count = i;
+			break;
 		}
 	}
 
@@ -432,15 +430,13 @@ bool CLineCount::countLines(tlc_linecount_t & linecount)
 	for (int i = 0; i < m_actual_thread_count; i++)
 	{
 		bool success = false;
-		if (m_threads[i] != NULL)
-		{
-#ifdef _WIN32
-			success = (WaitForSingleObject(m_threads[i], INFINITE) == WAIT_OBJECT_0);
-#else
-			success = pthread_join(m_threads[i], NULL) == 0;
-#endif
-		}
 
+#ifdef _WIN32
+		success = (WaitForSingleObject(m_threads[i], INFINITE) == WAIT_OBJECT_0);
+#else
+		success = pthread_join(m_threads[i], NULL) == 0;
+#endif
+	
 		if (success)
 		{
 			complete++;
