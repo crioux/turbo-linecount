@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0.0)
-PROJECT (turbo-linecount)
+PROJECT (turbo_linecount)
 
 IF(MSVC)
 	SET(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "limited configs" FORCE)
@@ -12,21 +12,21 @@ ELSE()
 	ADD_DEFINITIONS(-D_LARGEFILE_SOURCE=1 -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_BITS=64)
 ENDIF()
 
-ADD_LIBRARY (linecount SHARED src/turbo_linecount.cpp src/turbo_linecount.h)
-ADD_LIBRARY (linecount_static STATIC src/turbo_linecount.cpp src/turbo_linecount.h) 
-ADD_EXECUTABLE (lc src/main.cpp)
+ADD_LIBRARY (turbo_linecount SHARED src/turbo_linecount.cpp src/turbo_linecount.h)
+ADD_LIBRARY (turbo_linecount_static STATIC src/turbo_linecount.cpp src/turbo_linecount.h) 
+ADD_EXECUTABLE (tlc src/main.cpp)
 
 IF(THREADS_HAVE_PTHREAD_ARG)
-  SET_PROPERTY(TARGET lc PROPERTY COMPILE_OPTIONS "-pthread")
-  SET_PROPERTY(TARGET lc PROPERTY INTERFACE_COMPILE_OPTIONS "-pthread")
+  SET_PROPERTY(TARGET tlc PROPERTY COMPILE_OPTIONS "-pthread")
+  SET_PROPERTY(TARGET tlc PROPERTY INTERFACE_COMPILE_OPTIONS "-pthread")
 ENDIF()
 
-TARGET_LINK_LIBRARIES (lc linecount_static ${CMAKE_THREAD_LIBS_INIT})
+TARGET_LINK_LIBRARIES (tlc turbo_linecount_static ${CMAKE_THREAD_LIBS_INIT})
 
-INSTALL(TARGETS lc
+INSTALL(TARGETS tlc
         DESTINATION "bin"
         )
-INSTALL(TARGETS linecount linecount_static
+INSTALL(TARGETS turbo_linecount turbo_linecount_static
         DESTINATION "lib"
         )
 INSTALL(FILES src/turbo_linecount.h
