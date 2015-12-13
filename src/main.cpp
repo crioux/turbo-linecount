@@ -182,7 +182,7 @@ int main(int argc, char **argv)
 	}
 
 	// Display output
-	_tprintf(_T(TLC_LINECOUNT_FMT "\n"), count);
+	_tprintf(_T(TLC_LINECOUNT_FMT) _T("\n"), count);
 	
 	return 0;
 }

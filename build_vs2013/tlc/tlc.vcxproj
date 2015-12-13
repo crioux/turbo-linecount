@@ -19,18 +19,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\linecount_static\linecount_static.vcxproj">
-      <Project>{c6e64e54-0635-4a2b-b404-145ea82a761f}</Project>
-    </ProjectReference>
+    <ClCompile Include="..\..\src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\main.cpp" />
+    <ProjectReference Include="..\turbo_linecount_static\turbo_linecount_static.vcxproj">
+      <Project>{c6e64e54-0635-4a2b-b404-145ea82a761f}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E5D80D5A-FDE6-44FE-9E97-DF3D470DD5E9}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>linecount</RootNamespace>
-    <ProjectName>lc</ProjectName>
+    <ProjectName>tlc</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
