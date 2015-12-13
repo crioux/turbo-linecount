@@ -1,10 +1,10 @@
 #!/bin/sh
 
 
-lctest()
+tlctest()
 {
-	OUT=`(time lc $1) 2>&1 | grep real | cut -f 2 | cut -c 3-`
-	echo "lc: $1 $OUT"
+	OUT=`(time tlc $1) 2>&1 | grep real | cut -f 2 | cut -c 3-`
+	echo "tlc: $1 $OUT"
 	return 0
 }
 
@@ -23,10 +23,10 @@ pythontest()
 }
 
 echo Timing for 'lc'
-lctest test_10MB.txt
-lctest test_100MB.txt
-lctest test_1GB.txt
-lctest test_10GB.txt
+tlctest test_10MB.txt
+tlctest test_100MB.txt
+tlctest test_1GB.txt
+tlctest test_10GB.txt
 
 echo Timing for 'python'
 pythontest test_10MB.txt 
