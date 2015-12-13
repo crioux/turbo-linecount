@@ -9,6 +9,7 @@
 #include"turbo_linecount.h"
 #include<algorithm>
 #include<cstring>
+#include<cstdio>
 #include<errno.h>
 #ifdef min
 #undef min
@@ -303,6 +304,8 @@ unsigned int CLineCount::countThread(int thread_number)
 		// Move to next buffer
 		curoffset += stride;
 		lastmapsize = mapsize;
+
+//		printf("%lld\n", curoffset);
 	}
 
 	// Clean up memory map
