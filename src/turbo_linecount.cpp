@@ -262,7 +262,7 @@ unsigned int CLineCount::countThread(int thread_number)
 				return -1;
 			}
 		}
-		mem = MMAP(NULL, mapsize, PROT_READ, MAP_FILE | MAP_SHARED, m_fh, curoffset); */
+		mem = MMAP(NULL, mapsize, PROT_READ, MAP_FILE | MAP_SHARED, m_fh, curoffset);
 //		printf("%p %lld %lld\n",mem, mapsize, curoffset);
 #endif		
 		if (mem == MAP_FAILED)
