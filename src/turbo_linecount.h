@@ -16,16 +16,9 @@
 
 ///////////////////////////////////////////// Headers
 
-////////////// Platform independent
-
 #include<string>
 #include<vector>
 #include<errno.h>
-
-#define BEGIN_TURBOLINECOUNT_NAMESPACE namespace TURBOLINECOUNT {
-#define END_TURBOLINECOUNT_NAMESPACE }
-
-////////////// Platform specific
 
 #if defined(__APPLE__) || defined(__linux__) || defined(__CYGWIN__) 
 #define TLC_COMPATIBLE_UNIX 1
@@ -35,28 +28,21 @@
 
 #include<Windows.h>
 #include<tchar.h>
-typedef errno_t tlc_error_t;
 
 #elif defined(TLC_COMPATIBLE_UNIX)
 
 #include<unistd.h>
 #include<pthread.h>
 #define _T(x) x
-#define TCHAR char
-
-#ifdef _ERRNO_T
-typedef errno_t tlc_error_t;
-#elif defined(__error_t_defined)
-typedef error_t tlc_error_t;
-#else
-typedef int tlc_error_t;
-#endif
 
 #else
 #error Unsupported operating system.
 #endif
 
 ///////////////////////////////////////////// Line Count Class
+
+#define BEGIN_TURBOLINECOUNT_NAMESPACE namespace TURBOLINECOUNT {
+#define END_TURBOLINECOUNT_NAMESPACE }
 
 BEGIN_TURBOLINECOUNT_NAMESPACE;
 
@@ -68,14 +54,24 @@ BEGIN_TURBOLINECOUNT_NAMESPACE;
 	#else
 		typedef std::string tlc_string_t;
 	#endif
-
+	
+	typedef errno_t tlc_error_t;
 	typedef HANDLE tlc_filehandle_t;
 	typedef long long int tlc_fileoffset_t;
 	typedef tlc_fileoffset_t tlc_linecount_t;
 	#define TLC_LINECOUNT_FMT "%I64d"
 
 #elif defined(TLC_COMPATIBLE_UNIX) // Unix
-	
+	typedef char TCHAR;
+
+	#ifdef _ERRNO_T
+		typedef errno_t tlc_error_t;
+	#elif defined(__error_t_defined)
+		typedef error_t tlc_error_t;
+	#else
+		typedef int tlc_error_t;
+	#endif
+
 	typedef std::string tlc_string_t;
 	typedef int tlc_filehandle_t;
 	
