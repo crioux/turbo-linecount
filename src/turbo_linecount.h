@@ -33,7 +33,7 @@
 
 ////////////// Platform specific
 
-#if defined(_APPLE__) || defined(__linux__) || defined(__CYGWIN__) 
+#if defined(__APPLE__) || defined(__linux__) || defined(__CYGWIN__) 
 #define TLC_COMPATIBLE_UNIX 1
 #endif
 
@@ -49,7 +49,14 @@ typedef errno_t tlc_error_t;
 #include<pthread.h>
 #define _T(x) x
 #define TCHAR char
+
+#ifdef _ERRNO_T
+typedef errno_t tlc_error_t;
+#elif defined(__error_t_defined)
 typedef error_t tlc_error_t;
+#else
+typedef int tlc_error_t;
+#endif
 
 #else
 #error Unsupported operating system.

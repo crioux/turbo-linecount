@@ -32,3 +32,6 @@ build
 
 # Visual Studio build directory
 build_vs2013
+
+# Test Files
+test*.txt
