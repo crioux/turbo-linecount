@@ -28,6 +28,6 @@ INSTALL(TARGETS lc
 INSTALL(TARGETS linecount linecount_static
         DESTINATION "lib"
         )
-INSTALL(FILES linecount.h
+INSTALL(FILES src/turbo_linecount.h
         DESTINATION "include"
         )
