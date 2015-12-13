@@ -29,6 +29,8 @@
 #include<Windows.h>
 #include<tchar.h>
 
+typedef errno_t tlc_error_t;
+
 #elif defined(TLC_COMPATIBLE_UNIX)
 
 #include<unistd.h>
@@ -63,7 +65,6 @@ BEGIN_TURBOLINECOUNT_NAMESPACE;
 		typedef std::string tlc_string_t;
 	#endif
 	
-	typedef errno_t tlc_error_t;
 	typedef HANDLE tlc_filehandle_t;
 	typedef long long int tlc_fileoffset_t;
 	typedef tlc_fileoffset_t tlc_linecount_t;
