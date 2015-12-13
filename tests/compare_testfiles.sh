@@ -3,7 +3,12 @@
 
 tlctest()
 {
-	OUT=`(time tlc $1) 2>&1 | grep real | cut -f 2 | cut -c 3-`
+	TLC=tlc
+	if [ -f ./tlc ]; then
+		TLC=./tlc
+	fi
+	
+	OUT=`(time $TLC $1) 2>&1 | grep real | cut -f 2 | cut -c 3-`
 	echo "tlc: $1 $OUT"
 	return 0
 }
@@ -22,7 +27,7 @@ pythontest()
 	return 0
 }
 
-echo Timing for 'lc'
+echo Timing for 'tlc'
 tlctest test_10MB.txt
 tlctest test_100MB.txt
 tlctest test_1GB.txt
