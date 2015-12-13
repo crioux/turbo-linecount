@@ -6,6 +6,7 @@ IF(MSVC)
 	SET(CMAKE_CXX_FLAGS_RELEASE "/Ox /Ob2")
 	SET(CMAKE_C_FLAGS_RELEASE "/Ox /Ob2")
 ELSE()
+	FIND_PACKAGE (Threads REQUIRED)
 	SET(CMAKE_CXX_FLAGS_RELEASE "-O3")
 	SET(CMAKE_C_FLAGS_RELEASE "-O3")
 ENDIF()
@@ -13,7 +14,13 @@ ENDIF()
 ADD_LIBRARY (linecount SHARED src/turbo_linecount.cpp src/turbo_linecount.h)
 ADD_LIBRARY (linecount_static STATIC src/turbo_linecount.cpp src/turbo_linecount.h) 
 ADD_EXECUTABLE (lc src/main.cpp)
-TARGET_LINK_LIBRARIES (lc linecount_static)
+
+IF(THREADS_HAVE_PTHREAD_ARG)
+  SET_PROPERTY(TARGET lc PROPERTY COMPILE_OPTIONS "-pthread")
+  SET_PROPERTY(TARGET lc PROPERTY INTERFACE_COMPILE_OPTIONS "-pthread")
+ENDIF()
+
+TARGET_LINK_LIBRARIES (lc linecount_static ${CMAKE_THREAD_LIBS_INIT})
 
 INSTALL(TARGETS lc
         DESTINATION "bin"
