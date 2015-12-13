@@ -1,12 +1,14 @@
 #!/bin/sh
 
+if [ "$1" = "" ]; then 
+	echo "specify path to tlc binary"
+	exit 1
+else
+	TLC=$1
+fi
 
 tlctest()
 {
-	TLC=tlc
-	if [ -f ./tlc ]; then
-		TLC=./tlc
-	fi
 	
 	OUT=`(time $TLC $1) 2>&1 | grep real | cut -f 2 | cut -c 3-`
 	echo "tlc: $1 $OUT"
