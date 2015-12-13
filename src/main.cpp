@@ -45,7 +45,7 @@ void help(const TCHAR *argv0)
 
 void version(void)
 {
-	_tprintf(_T("lc (linecount) %d.%2.2d\nCopyright (c) 2015 Christien Rioux\n"), LINECOUNT_VERSION_MAJOR, LINECOUNT_VERSION_MINOR);
+	_tprintf(_T("tlc (turbo-linecount) %d.%2.2d\nCopyright (c) 2015 Christien Rioux\n"), TURBOLINECOUNT_VERSION_MAJOR, TURBOLINECOUNT_VERSION_MINOR);
 }
 
 //////////////////////////////////////////////////////
