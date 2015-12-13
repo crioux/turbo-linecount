@@ -58,11 +58,6 @@ Testing cmake against `wc` and `python` can be done with the test scripts. To ge
 
 To run the test, run `compare_testfiles.sh`. This will generate output as such:
 
-
-### Performance
-
-Performance on Windows and Mac OS X is excellent for all file sizes. Performance on Linux and other operating systems is good, but can be better. Stay tuned.
-
 ```
 Timing for tlc
 lc: test_10MB.txt 0.006s
@@ -81,8 +76,18 @@ wc: test_1GB.txt 0.933s
 wc: test_10GB.txt 9.857s
 ``` 
 
-|   |   |   |   |   |
-|---|---|---|---|---|
-|   |   |   |   |   |
-|   |   |   |   |   |
-|   |   |   |   |   |
+### Performance
+
+Performance on Windows and Mac OS X is excellent for all file sizes. Performance on Linux and other operating systems is good, but can be better. Stay tuned.
+
+* Macbook Pro (Retina, 15-inch Mid 2014)  
+* 2.8 GHz Intel Core i7  
+* 1TB SSD hard drive  
+* 16GB Memory
+
+| File Size | `tlc`  | `python`  | `wc -l` |
+|-----------|---|---|---|---|---|
+| 10MB      | 0.006s  | 0.025s (4.2x) | 0.012s (2.0x) |
+| 100MB     | 0.015s  | 0.084s (5.6x) |  0.100s (6.7x) | 
+| 1GB       | 0.127s  | 0.661s (5.2x) | 0.933s (7.3x) |
+| 10GB      | 1.196s   | 6.165s (5.15x) | 9.857s (8.2x) |
