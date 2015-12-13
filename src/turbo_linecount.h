@@ -78,11 +78,7 @@ BEGIN_TURBOLINECOUNT_NAMESPACE;
 	
 	#if (defined (__APPLE__) && defined (__MACH__))
 		typedef off_t tlc_fileoffset_t;
-		#ifdef __LP64__
-			#define TLC_LINECOUNT_FMT "%ld"
-		#else 
-			#define TLC_LINECOUNT_FMT "%lld"
-		#endif
+		#define TLC_LINECOUNT_FMT "%lld"
 	#elif defined(_LARGEFILE64_SOURCE)
 		#if defined(__CYGWIN__)
 			typedef _off64_t tlc_fileoffset_t;	
