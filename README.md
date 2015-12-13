@@ -5,7 +5,7 @@ turbo-linecount 1.0 Copyright 2015, Christien Rioux
 
 *turbo-linecount* is a tool that simply counts the number of lines in a file, as fast as possible. It reads the file in large chunks into several threads and quickly scans the file for line endings.
 
-Many times, you have to count the number of lines in text file on disk. The typical solution is to use `wc -l` on the command line. `wc -l` uses buffered streams to process the file, which has its advantages, but it is slower than direct memory mapped file access. You can't 'pipe' to 
+Many times, you have to count the number of lines in text file on disk. The typical solution is to use `wc -l` on the command line. `wc -l` uses buffered streams to process the file, which has its advantages, but it is slower than direct memory mapped file access. You can't 'pipe' to *turbo-linecount* however. This may change in a future release.
 
 How much faster is *turbo-linecount*? About 8 times faster than `wc -l` and 5 times faster than the naive Python implementation.
 
