@@ -35,6 +35,14 @@
 #include<pthread.h>
 #define _T(x) x
 
+#ifdef _ERRNO_T
+typedef errno_t tlc_error_t;
+#elif defined(__error_t_defined)
+typedef error_t tlc_error_t;
+#else
+typedef int tlc_error_t;
+#endif
+
 #else
 #error Unsupported operating system.
 #endif
@@ -63,14 +71,6 @@ BEGIN_TURBOLINECOUNT_NAMESPACE;
 
 #elif defined(TLC_COMPATIBLE_UNIX) // Unix
 	typedef char TCHAR;
-
-	#ifdef _ERRNO_T
-		typedef errno_t tlc_error_t;
-	#elif defined(__error_t_defined)
-		typedef error_t tlc_error_t;
-	#else
-		typedef int tlc_error_t;
-	#endif
 
 	typedef std::string tlc_string_t;
 	typedef int tlc_filehandle_t;
@@ -172,8 +172,8 @@ extern "C"
 #endif
 
 #ifdef _WIN32
-	long long int turbo_linecount_handle(HANDLE fhandle, tlc_error_t * error = NULL, TCHAR ** errorstring = NULL);
-	long long int turbo_linecount_file(const TCHAR *filename, tlc_error_t * error = NULL, TCHAR ** errorstring = NULL);
+	long long int turbo_linecount_handle(HANDLE fhandle, errno_t * error = NULL, TCHAR ** errorstring = NULL);
+	long long int turbo_linecount_file(const TCHAR *filename, errno_t * error = NULL, TCHAR ** errorstring = NULL);
 #elif defined(TLC_COMPATIBLE_UNIX)
 	long long int turbo_linecount_handle(int fhandle, tlc_error_t * tlc_error = NULL, char ** errorstring = NULL);
 	long long int turbo_linecount_file(const char *filename, tlc_error_t * error = NULL, char ** errorstring = NULL);
