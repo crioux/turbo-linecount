@@ -12,12 +12,6 @@
 #define LINECOUNT_VERSION_MAJOR 1
 #define LINECOUNT_VERSION_MINOR 0
 
-#if defined(__CYGWIN__) || defined(__linux__) || defined(__MINGW32__)
-#ifndef _LARGEFILE64_SOURCE
-#define _LARGEFILE64_SOURCE 1
-#endif
-#endif
-
 #ifdef __cplusplus
 
 ///////////////////////////////////////////// Headers
