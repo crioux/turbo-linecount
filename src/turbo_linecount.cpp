@@ -229,6 +229,8 @@ unsigned int CLineCount::countThread(int thread_number)
 	tlc_linecount_t count = 0;
 	void *mem = NULL;
 
+		void *mapmem = MMAP(NULL, m_filesize, PROT_READ, MAP_FILE | MAP_SHARED, m_fh, 0);
+madvise(mapmem, m_filesize, MADV_SEQUENTIAL);
 	while (curoffset < m_filesize)
 	{
 		if (m_thread_fail)
@@ -253,7 +255,7 @@ unsigned int CLineCount::countThread(int thread_number)
 		}
 		mem = MapViewOfFile(m_filemapping, FILE_MAP_READ, (DWORD)(curoffset >> 32), (DWORD)curoffset, (SIZE_T)mapsize);
 #else
-		if (mem)
+/*		if (mem)
 		{
 			if(munmap(mem, lastmapsize) !=0)
 			{
@@ -262,7 +264,8 @@ unsigned int CLineCount::countThread(int thread_number)
 				return -1;
 			}
 		}
-		mem = MMAP(NULL, mapsize, PROT_READ, MAP_FILE | MAP_SHARED, m_fh, curoffset);
+		mem = MMAP(NULL, mapsize, PROT_READ, MAP_FILE | MAP_SHARED, m_fh, curoffset); */
+mem = ((char *)mapmem) + curoffset;
 //		printf("%p %lld %lld\n",mem, mapsize, curoffset);
 #endif		
 		if (mem == MAP_FAILED)
