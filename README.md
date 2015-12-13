@@ -12,7 +12,7 @@ How much faster is *turbo-linecount*? About 8 times faster than `wc -l` and 5 ti
 To use *turbo-linecount*, just run the command line:
 
 ```
-lc <file>
+tlc <file>
 ```
 
 where *\<file\>* is the path to the file of which you'd like to count the lines. 
@@ -21,8 +21,8 @@ where *\<file\>* is the path to the file of which you'd like to count the lines.
 To get help with *turbo-linecount*:
 
 ```
-lc -h
-usage: lc [options] <file>
+tlc -h
+usage: tlc [options] <file>
     -h  --help                         print this usage and exit
     -b  --buffersize <BUFFERSIZE>      size of buffer per-thread to use when reading (default is 1MB)
     -t  --threadcount <THREADCOUNT>    number of threads to use (defaults to number of cpu cores)
@@ -60,10 +60,10 @@ To run the test, run `compare_testfiles.sh`. This will generate output as such:
 
 ```
 Timing for tlc
-lc: test_10MB.txt 0.006s
-lc: test_100MB.txt 0.015s
-lc: test_1GB.txt 0.127s
-lc: test_10GB.txt 1.196s
+tlc: test_10MB.txt 0.006s
+tlc: test_100MB.txt 0.015s
+tlc: test_1GB.txt 0.127s
+tlc: test_10GB.txt 1.196s
 Timing for python
 python: test_10MB.txt 0.025s
 python: test_100MB.txt 0.084s
