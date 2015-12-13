@@ -23,7 +23,6 @@
 #define LCINVALIDHANDLE INVALID_HANDLE_VALUE
 #define LCSETREALLASTERROR(err, errstr) { setLastError((err), (errstr)); }
 #define MAP_FAILED NULL
-typedef long long tlc_fileoffset_t;
 
 #elif defined(TLC_COMPATIBLE_UNIX)
 
@@ -34,17 +33,14 @@ typedef long long tlc_fileoffset_t;
 #include<sys/mman.h>
 #if (defined (__APPLE__) && defined (__MACH__))
 #include <sys/sysctl.h>
-typedef off_t tlc_fileoffset_t;
 #define MMAP ::mmap
 #define FSTAT ::fstat
 #define STAT ::stat
 #elif (defined(__linux__) || defined(__cygwin__)) && defined(_LARGEFILE64_SOURCE)
-typedef off64_t tlc_fileoffset_t;
 #define MMAP ::mmap64
 #define FSTAT ::fstat64
 #define STAT ::stat64
 #else
-typedef off_t tlc_fileoffset_t;
 #define MMAP ::mmap
 #define FSTAT ::fstat
 #define STAT ::stat

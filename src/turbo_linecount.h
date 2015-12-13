@@ -70,7 +70,7 @@ BEGIN_TURBOLINECOUNT_NAMESPACE;
 	#endif
 
 	typedef HANDLE tlc_filehandle_t;
-	typedef long long tlc_fileoffset_t;
+	typedef long long int tlc_fileoffset_t;
 	typedef tlc_fileoffset_t tlc_linecount_t;
 	#define TLC_LINECOUNT_FMT "%I64d"
 
@@ -78,6 +78,7 @@ BEGIN_TURBOLINECOUNT_NAMESPACE;
 	
 	typedef std::string tlc_string_t;
 	typedef int tlc_filehandle_t;
+	
 	#if (defined (__APPLE__) && defined (__MACH__))
 		typedef off_t tlc_fileoffset_t;
 		#define TLC_LINECOUNT_FMT "%lld"
@@ -92,6 +93,7 @@ BEGIN_TURBOLINECOUNT_NAMESPACE;
 		typedef off_t tlc_fileoffset_t;
 		#define TLC_LINECOUNT_FMT "%d"
 	#endif
+
 	typedef tlc_fileoffset_t tlc_linecount_t;
 
 #endif
@@ -174,11 +176,11 @@ extern "C"
 #endif
 
 #ifdef _WIN32
-	long long turbo_linecount_handle(HANDLE fhandle, tlc_error_t * error = NULL, TCHAR ** errorstring = NULL);
-	long long turbo_linecount_file(const TCHAR *filename, tlc_error_t * error = NULL, TCHAR ** errorstring = NULL);
+	long long int turbo_linecount_handle(HANDLE fhandle, tlc_error_t * error = NULL, TCHAR ** errorstring = NULL);
+	long long int turbo_linecount_file(const TCHAR *filename, tlc_error_t * error = NULL, TCHAR ** errorstring = NULL);
 #elif defined(TLC_COMPATIBLE_UNIX)
-	long long turbo_linecount_handle(int fhandle, tlc_error_t * tlc_error = NULL, char ** errorstring = NULL);
-	long long turbo_linecount_file(const char *filename, tlc_error_t * error = NULL, char ** errorstring = NULL);
+	long long int turbo_linecount_handle(int fhandle, tlc_error_t * tlc_error = NULL, char ** errorstring = NULL);
+	long long int turbo_linecount_file(const char *filename, tlc_error_t * error = NULL, char ** errorstring = NULL);
 #endif
 
 
