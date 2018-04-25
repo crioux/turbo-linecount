@@ -85,9 +85,11 @@ Performance on Windows and Mac OS X is excellent for all file sizes. Performance
 * 1TB SSD hard drive  
 * 16GB Memory
 
-| File Size | `tlc`  | `python`  | `wc -l` |
-|-----------|---|---|---|---|---|
-| 10MB      | 0.006s  | 0.025s (4.2x) | 0.012s (2.0x) |
-| 100MB     | 0.015s  | 0.084s (5.6x) |  0.100s (6.7x) | 
-| 1GB       | 0.127s  | 0.661s (5.2x) | 0.933s (7.3x) |
-| 10GB      | 1.196s   | 6.165s (5.15x) | 9.857s (8.2x) |
+```
+| File Size | `tlc`  | `python`       | `wc -l`        |
+|-----------|--------|----------------|----------------|
+| 10MB      | 0.006s | 0.025s (4.2x)  | 0.012s (2.0x)  |
+| 100MB     | 0.015s | 0.084s (5.6x)  |  0.100s (6.7x) | 
+| 1GB       | 0.127s | 0.661s (5.2x)  | 0.933s (7.3x)  |
+| 10GB      | 1.196s | 6.165s (5.15x) | 9.857s (8.2x)  |
+```
