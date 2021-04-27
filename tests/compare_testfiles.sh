@@ -9,7 +9,6 @@ fi
 
 tlctest()
 {
-	
 	OUT=`(time $TLC $1) 2>&1 | grep real | cut -f 2 | cut -c 3-`
 	echo "tlc: $1 $OUT"
 	return 0
@@ -36,7 +35,7 @@ tlctest test_1GB.txt
 tlctest test_10GB.txt
 
 echo Timing for 'python'
-pythontest test_10MB.txt 
+pythontest test_10MB.txt
 pythontest test_100MB.txt
 pythontest test_1GB.txt
 pythontest test_10GB.txt
