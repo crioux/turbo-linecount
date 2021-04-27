@@ -25,7 +25,7 @@ wctest()
 
 pythontest()
 {
-	OUT=`(time echo "print str(sum(1 for line in open('$1'))) + ' $1'" | python) 2>&1 | grep real | cut -f 2 | cut -c 3-`
+	OUT=`(time python -c "print str(sum(1 for line in open('$1'))) + ' $1'") 2>&1 | grep real | cut -f 2 | cut -c 3-`
 	echo "python: $1 $OUT"
 	return 0
 }
