@@ -1,6 +1,8 @@
 #!/bin/sh
 
-if [ "$1" = "" ]; then 
+export TIME='real\t  %e'
+
+if [ "$1" = "" ]; then
 	echo "specify path to tlc binary"
 	exit 1
 else
